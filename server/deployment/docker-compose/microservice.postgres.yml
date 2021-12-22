@@ -1,0 +1,427 @@
+version: '3.7'
+
+services:
+  command:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/command/app.js'
+    environment:
+      NODE_ENV: 'production'
+      APPLICATION_DIRECTORY: '/app'
+      COMMAND_CORS_ORIGIN: '*'
+      COMMAND_DISPATCHER_HOST_NAME: 'command-dispatcher'
+      COMMAND_DISPATCHER_PORT: '3000'
+      COMMAND_DISPATCHER_PROTOCOL: 'http'
+      COMMAND_DISPATCHER_RETRIES: '5'
+      ENABLE_OPEN_API_DOCUMENTATION: 'true'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      IDENTITY_PROVIDERS: '[]'
+      PORT: '3000'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.command.rule=PathPrefix(`/command`)'
+      - 'traefik.http.routers.command.entrypoints=web'
+      - 'traefik.http.services.command-service.loadbalancer.server.port=3000'
+      - 'traefik.http.services.command-service.loadbalancer.healthcheck.path=/health/v2/'
+      - 'traefik.http.services.command-service.loadbalancer.healthcheck.port=3001'
+
+  command-dispatcher:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/commandDispatcher/app.js'
+    environment:
+      NODE_ENV: 'production'
+      APPLICATION_DIRECTORY: '/app'
+      AWAIT_COMMAND_CORS_ORIGIN: '*'
+      HANDLE_COMMAND_CORS_ORIGIN: '*'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      MISSED_COMMAND_RECOVERY_INTERVAL: '5000'
+      PORT: '3000'
+      PRIORITY_QUEUE_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"items":"items-command","priorityQueue":"priorityQueue-command"},"expirationTime":30000}'
+      PUB_SUB_OPTIONS: '{"channelForNewCommands":"newCommand","subscriber":{"type":"InMemory"},"publisher":{"type":"InMemory"}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  domain:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/domain/app.js'
+    environment:
+      NODE_ENV: 'production'
+      AEONSTORE_HOST_NAME: 'aeonstore'
+      AEONSTORE_PORT: '3000'
+      AEONSTORE_PROTOCOL: 'http'
+      APPLICATION_DIRECTORY: '/app'
+      COMMAND_DISPATCHER_ACKNOWLEDGE_RETRIES: '5'
+      COMMAND_DISPATCHER_HOST_NAME: 'command-dispatcher'
+      COMMAND_DISPATCHER_PORT: '3000'
+      COMMAND_DISPATCHER_PROTOCOL: 'http'
+      COMMAND_DISPATCHER_RENEW_INTERVAL: '5000'
+      CONCURRENT_COMMANDS: '1'
+      DOMAIN_EVENT_DISPATCHER_HOST_NAME: 'domain-event-dispatcher'
+      DOMAIN_EVENT_DISPATCHER_PORT: '3000'
+      DOMAIN_EVENT_DISPATCHER_PROTOCOL: 'http'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      LOCK_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"locks":"locks"}}'
+      PUB_SUB_OPTIONS: '{"channelForNotifications":"notification","channelForNewDomainEvents":"newDomainEvent","publisher":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/publish/v2"}}'
+      SNAPSHOT_STRATEGY: '{"name":"lowest","configuration":{"revisionLimit":100,"durationLimit":500}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  domain-event:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/domainEvent/app.js'
+    environment:
+      NODE_ENV: 'production'
+      AEONSTORE_HOST_NAME: 'aeonstore'
+      AEONSTORE_PORT: '3000'
+      AEONSTORE_PROTOCOL: 'http'
+      APPLICATION_DIRECTORY: '/app'
+      DOMAIN_EVENT_CORS_ORIGIN: '*'
+      ENABLE_OPEN_API_DOCUMENTATION: 'true'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      IDENTITY_PROVIDERS: '[]'
+      PORT: '3000'
+      PUB_SUB_OPTIONS: '{"channelForNewDomainEvents":"newDomainEvent","channelForNotifications":"notification","publisher":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/publish/v2"},"subscriber":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/subscribe/v2"}}'
+      SNAPSHOT_STRATEGY: '{"name":"lowest","configuration":{"revisionLimit":100,"durationLimit":500}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.domain-event.rule=PathPrefix(`/domain-events`)'
+      - 'traefik.http.routers.domain-event.entrypoints=web'
+      - 'traefik.http.services.domain-event-service.loadbalancer.server.port=3000'
+      - 'traefik.http.services.domain-event-service.loadbalancer.healthcheck.path=/health/v2/'
+      - 'traefik.http.services.domain-event-service.loadbalancer.healthcheck.port=3001'
+
+  aeonstore:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/domainEventStore/app.js'
+    environment:
+      NODE_ENV: 'production'
+      DOMAIN_EVENT_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"domainEvents":"domainevents","snapshots":"snapshots"}}'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      PORT: '3000'
+      QUERY_DOMAIN_EVENTS_CORS_ORIGIN: '*'
+      WRITE_DOMAIN_EVENTS_CORS_ORIGIN: '*'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  publisher:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/publisher/app.js'
+    environment:
+      NODE_ENV: 'production'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      PORT: '3000'
+      PUBLISH_CORS_ORIGIN: '*'
+      PUB_SUB_OPTIONS: '{"subscriber":{"type":"InMemory"},"publisher":{"type":"InMemory"}}'
+      SUBSCRIBE_CORS_ORIGIN: '*'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  graphql:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/graphql/app.js'
+    environment:
+      NODE_ENV: 'production'
+      AEONSTORE_HOST_NAME: 'aeonstore'
+      AEONSTORE_PORT: '3000'
+      AEONSTORE_PROTOCOL: 'http'
+      APPLICATION_DIRECTORY: '/app'
+      COMMAND_DISPATCHER_HOST_NAME: 'command-dispatcher'
+      COMMAND_DISPATCHER_PORT: '3000'
+      COMMAND_DISPATCHER_PROTOCOL: 'http'
+      COMMAND_DISPATCHER_RETRIES: '5'
+      CORS_ORIGIN: '*'
+      ENABLE_INTEGRATED_CLIENT: 'true'
+      HEALTH_PORT: '3001'
+      IDENTITY_PROVIDERS: '[]'
+      PORT: '3000'
+      PUB_SUB_OPTIONS: '{"channelForNewDomainEvents":"newDomainEvent","channelForNotifications":"notification","publisher":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/publish/v2"},"subscriber":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/subscribe/v2"}}'
+      SNAPSHOT_STRATEGY: '{"name":"lowest","configuration":{"revisionLimit":100,"durationLimit":500}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.graphql.rule=PathPrefix(`/graphql`)'
+      - 'traefik.http.routers.graphql.entrypoints=web'
+      - 'traefik.http.services.graphql-service.loadbalancer.server.port=3000'
+      - 'traefik.http.services.graphql-service.loadbalancer.healthcheck.path=/health/v2/'
+      - 'traefik.http.services.graphql-service.loadbalancer.healthcheck.port=3001'
+
+  domain-event-dispatcher:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/domainEventDispatcher/app.js'
+    environment:
+      NODE_ENV: 'production'
+      APPLICATION_DIRECTORY: '/app'
+      AWAIT_DOMAIN_EVENT_CORS_ORIGIN: '*'
+      HANDLE_DOMAIN_EVENT_CORS_ORIGIN: '*'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      MISSED_DOMAIN_EVENT_RECOVERY_INTERVAL: '5000'
+      PORT: '3000'
+      PRIORITY_QUEUE_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"items":"items-domain-event","priorityQueue":"priorityQueue-domain-event"},"expirationTime":30000}'
+      PUB_SUB_OPTIONS: '{"channelForNewInternalDomainEvents":"newInternalDomainEvent","subscriber":{"type":"InMemory"},"publisher":{"type":"InMemory"}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  flow:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/flow/app.js'
+    environment:
+      NODE_ENV: 'production'
+      AEONSTORE_HOST_NAME: 'aeonstore'
+      AEONSTORE_PORT: '3000'
+      AEONSTORE_PROTOCOL: 'http'
+      APPLICATION_DIRECTORY: '/app'
+      COMMAND_DISPATCHER_HOST_NAME: 'command-dispatcher'
+      COMMAND_DISPATCHER_PORT: '3000'
+      COMMAND_DISPATCHER_PROTOCOL: 'http'
+      CONCURRENT_FLOWS: '1'
+      CONSUMER_PROGRESS_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"progress":"progress-flow"}}'
+      DOMAIN_EVENT_DISPATCHER_ACKNOWLEDGE_RETRIES: '5'
+      DOMAIN_EVENT_DISPATCHER_HOST_NAME: 'domain-event-dispatcher'
+      DOMAIN_EVENT_DISPATCHER_PORT: '3000'
+      DOMAIN_EVENT_DISPATCHER_PROTOCOL: 'http'
+      DOMAIN_EVENT_DISPATCHER_RENEW_INTERVAL: '5000'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      LOCK_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"locks":"locks"}}'
+      PUB_SUB_OPTIONS: '{"channelForNotifications":"notification","publisher":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/publish/v2"}}'
+      REPLAY_SERVER_HOST_NAME: 'replay'
+      REPLAY_SERVER_PORT: '3000'
+      REPLAY_SERVER_PROTOCOL: 'http'
+      SNAPSHOT_STRATEGY: '{"name":"lowest","configuration":{"revisionLimit":100,"durationLimit":500}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  replay:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/replay/app.js'
+    environment:
+      NODE_ENV: 'production'
+      AEONSTORE_HOST_NAME: 'aeonstore'
+      AEONSTORE_PORT: '3000'
+      AEONSTORE_PROTOCOL: 'http'
+      APPLICATION_DIRECTORY: '/app'
+      CORS_ORIGIN: '*'
+      DOMAIN_EVENT_DISPATCHER_HOST_NAME: 'domain-event-dispatcher'
+      DOMAIN_EVENT_DISPATCHER_PORT: '3000'
+      DOMAIN_EVENT_DISPATCHER_PROTOCOL: 'http'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      PORT: '3000'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  view:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/view/app.js'
+    environment:
+      NODE_ENV: 'production'
+      APPLICATION_DIRECTORY: '/app'
+      ENABLE_OPEN_API_DOCUMENTATION: 'true'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      IDENTITY_PROVIDERS: '[]'
+      PORT: '3000'
+      PUB_SUB_OPTIONS: '{"channelForNotifications":"notification","publisher":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/publish/v2"},"subscriber":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/subscribe/v2"}}'
+      VIEW_CORS_ORIGIN: '*'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.view.rule=PathPrefix(`/views`)'
+      - 'traefik.http.routers.view.entrypoints=web'
+      - 'traefik.http.services.view-service.loadbalancer.server.port=3000'
+      - 'traefik.http.services.view-service.loadbalancer.healthcheck.path=/health/v2/'
+      - 'traefik.http.services.view-service.loadbalancer.healthcheck.port=3001'
+
+  notification:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/notification/app.js'
+    environment:
+      NODE_ENV: 'production'
+      APPLICATION_DIRECTORY: '/app'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      IDENTITY_PROVIDERS: '[]'
+      SUBSCRIBE_CORS_ORIGIN: '*'
+      PORT: '3000'
+      PUB_SUB_OPTIONS: '{"channelForNotifications":"notification","subscriber":{"type":"Http","protocol":"http","hostName":"publisher","port":3000,"path":"/subscribe/v2"}}'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.notification.rule=PathPrefix(`/notifications`)'
+      - 'traefik.http.routers.notification.entrypoints=web'
+      - 'traefik.http.services.notification-service.loadbalancer.server.port=3000'
+      - 'traefik.http.services.notification-service.loadbalancer.healthcheck.path=/health/v2/'
+      - 'traefik.http.services.notification-service.loadbalancer.healthcheck.port=3001'
+
+  file:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/microservice/processes/file/app.js'
+    environment:
+      NODE_ENV: 'production'
+      APPLICATION_DIRECTORY: '/app'
+      FILE_CORS_ORIGIN: '*'
+      FILE_STORE_OPTIONS: '{"type":"S3","hostName":"minio","port":9000,"encryptConnection":false,"accessKey":"wolkenkit","secretKey":"please-replace-this","bucketName":"files"}'
+      ENABLE_OPEN_API_DOCUMENTATION: 'true'
+      HEALTH_CORS_ORIGIN: '*'
+      HEALTH_PORT: '3001'
+      IDENTITY_PROVIDERS: '[]'
+      PORT: '3000'
+    image: 'rideshare'
+    init: true
+    restart: 'always'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.file.rule=PathPrefix(`/files`)'
+      - 'traefik.http.routers.file.entrypoints=web'
+      - 'traefik.http.services.file-service.loadbalancer.server.port=3000'
+      - 'traefik.http.services.file-service.loadbalancer.healthcheck.path=/health/v2/'
+      - 'traefik.http.services.file-service.loadbalancer.healthcheck.port=3001'
+
+  postgres:
+    image: 'postgres:12.4-alpine'
+    environment:
+      POSTGRES_DB: 'wolkenkit'
+      POSTGRES_USER: 'wolkenkit'
+      POSTGRES_PASSWORD: 'please-replace-this'
+      PGDATA: '/var/lib/postgresql/data'
+    restart: 'always'
+    volumes:
+      - 'postgres:/var/lib/postgresql/data'
+
+  minio:
+    image: 'minio/minio:RELEASE.2019-10-12T01-39-57Z'
+    command: 'server /data'
+    environment:
+      MINIO_ACCESS_KEY: 'wolkenkit'
+      MINIO_SECRET_KEY: 'please-replace-this'
+    restart: 'always'
+    volumes:
+      - 'minio:/data'
+      
+  traefik:
+    image: 'traefik:2.3'
+    command:
+      - '--log.level=DEBUG'
+      - '--api.insecure=true'
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--entrypoints.web.address=:3000'
+      - '--ping'
+    ports:
+      - '3000:3000'
+      - '8080:8080'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres:
+  minio:

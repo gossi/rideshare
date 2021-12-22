@@ -1,0 +1,56 @@
+version: '3.7'
+
+services:
+  main:
+    build: '../..'
+    command: 'node ./node_modules/wolkenkit/build/lib/runtimes/singleProcess/processes/main/app.js'
+    environment:
+      NODE_ENV: 'production'
+      LOG_LEVEL: 'debug'
+      APPLICATION_DIRECTORY: '/app'
+      COMMAND_QUEUE_RENEW_INTERVAL: '5000'
+      CONCURRENT_COMMANDS: '100'
+      CONCURRENT_FLOWS: '1'
+      CONSUMER_PROGRESS_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"progress":"progress-flow"}}'
+      CORS_ORIGIN: '*'
+      DOMAIN_EVENT_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"domainEvents":"domainevents","snapshots":"snapshots"}}'
+      ENABLE_OPEN_API_DOCUMENTATION: 'true'
+      FILE_STORE_OPTIONS: '{"type":"FileSystem","directory":"/mnt/files"}'
+      GRAPHQL_API: '{"enableIntegratedClient":true}'
+      HEALTH_PORT: '3001'
+      HTTP_API: 'true'
+      IDENTITY_PROVIDERS: '[]'
+      LOCK_STORE_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"locks":"locks"}}'
+      PORT: '3000'
+      PRIORITY_QUEUE_STORE_FOR_COMMANDS_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"items":"items-command","priorityQueue":"priorityQueue-command"},"expirationTime":30000}'
+      PRIORITY_QUEUE_STORE_FOR_DOMAIN_EVENTS_OPTIONS: '{"type":"Postgres","hostName":"postgres","port":5432,"userName":"wolkenkit","password":"please-replace-this","database":"wolkenkit","tableNames":{"items":"items-domain-event","priorityQueue":"priorityQueue-domain-event"},"expirationTime":30000}'
+      PUB_SUB_OPTIONS: '{"channelForNotifications":"notification","publisher":{"type":"InMemory"},"subscriber":{"type":"InMemory"}}'
+      SNAPSHOT_STRATEGY: '{"name":"lowest","configuration":{"revisionLimit":100,"durationLimit":500}}'
+    image: 'rideshare'
+    init: true
+    ports:
+      - '3000:3000'
+    restart: 'always'
+    volumes:
+      - 'files:/mnt/files'
+    healthcheck:
+      test: ["CMD", "node", "./node_modules/wolkenkit/build/lib/bin/wolkenkit", "health", "--health-port", "3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  postgres:
+    image: 'postgres:12.4-alpine'
+    environment:
+      POSTGRES_DB: 'wolkenkit'
+      POSTGRES_USER: 'wolkenkit'
+      POSTGRES_PASSWORD: 'please-replace-this'
+      PGDATA: '/var/lib/postgresql/data'
+    restart: 'always'
+    volumes:
+      - 'postgres:/var/lib/postgresql/data'
+
+volumes:
+  files:
+  postgres:
