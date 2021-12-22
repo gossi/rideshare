@@ -33,6 +33,7 @@ export default class SessionService extends Session {
     if (data && data.as) {
       if (data.as === UserType.Driver) {
         this.user = {
+          id: UserType.Driver,
           name: 'Dan Driver',
           type: UserType.Driver
         };
@@ -40,6 +41,7 @@ export default class SessionService extends Session {
 
       if (data.as === UserType.Rider) {
         this.user = {
+          id: UserType.Rider,
           name: 'Ron Rider',
           type: UserType.Rider
         };
