@@ -1,0 +1,17 @@
+{{did-insert this.activate}}
+<h1>Request a new Ride</h1>
+
+<form {{on "submit" this.submit}}>
+  <label>
+    From:
+    <input type="text" name="from">
+  </label>
+
+  <label>
+    To:
+    <input type="text" name="to">
+  </label>
+
+  {{!-- template-lint-disable require-input-label --}}
+  <input type="submit" value="Request">
+</form>

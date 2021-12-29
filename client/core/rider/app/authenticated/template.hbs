@@ -1,0 +1,8 @@
+SC:
+{{#if @model.rides}}Rides{{/if}}
+  {{#if @model.request}}Request{{/if}}
+    {{#if @model.ride}}Ride{{/if}}
+
+      <ContextProvider @key="rideFlow" @value={{@model.flow}}>
+        {{outlet}}
+      </ContextProvider>

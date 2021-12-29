@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "description": "rideshare is built with wolkenkit, an open-source CQRS and event-sourcing framework for JavaScript and Node.js.",
   "dependencies": {
+    "@rideshare/ride": "^0.0.0",
+    "@rideshare/user": "^0.0.0",
     "wolkenkit": "4.0.0-ctp.6"
   },
   "devDependencies": {

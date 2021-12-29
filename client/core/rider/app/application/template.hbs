@@ -1,0 +1,27 @@
+{{page-title "Rider @rideshare"}}
+
+<nav class="container">
+  <ul>
+    <li><strong>Rideshare</strong> Rider</li>
+
+    {{#if this.session.isAuthenticated}}
+      <li>
+        <LinkTo @route="authenticated">Rides</LinkTo>
+      </li>
+    {{/if}}
+  </ul>
+  <ul>
+    {{#if this.session.isAuthenticated}}
+      <li>{{this.session.user.name}}</li>
+      <li><button type="button" {{on "click" this.logout}}>Logout</button></li>
+    {{else}}
+      <li>
+        <LinkTo @route="login">Login</LinkTo>
+      </li>
+    {{/if}}
+  </ul>
+</nav>
+
+<main class="container">
+  {{outlet}}
+</main>

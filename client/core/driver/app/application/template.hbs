@@ -1,0 +1,33 @@
+{{page-title "@rideshare/driver"}}
+
+<nav class="container">
+  <ul>
+    <li><strong>Rideshare</strong></li>
+
+    {{#if (this.userAbility.isRider)}}
+      <li>
+        <LinkTo @route="authenticated.rider">Rider</LinkTo>
+      </li>
+    {{/if}}
+
+    {{#if (this.userAbility.isDriver)}}
+      <li>
+        <LinkTo @route="authenticated.driver">Driver</LinkTo>
+      </li>
+    {{/if}}
+  </ul>
+  <ul>
+    {{#if (this.userAbility.isAuthenticated)}}
+      <li>{{this.session.user.name}}</li>
+      <li><button type="button" {{on "click" this.logout}}>Logout</button></li>
+    {{else}}
+      <li>
+        <LinkTo @route="login">Login</LinkTo>
+      </li>
+    {{/if}}
+  </ul>
+</nav>
+
+<main class="container">
+  {{outlet}}
+</main>
