@@ -34,12 +34,7 @@ export default class RequestRide extends Command {
       }
     });
 
-    console.log('response', response?.command);
-
     const id = response?.command?.rider_ride_request.aggregateIdentifier.id;
-
-    console.log('open ride', response, id);
-
     if (id) {
       this.#flow.send('OPEN', { id });
     }

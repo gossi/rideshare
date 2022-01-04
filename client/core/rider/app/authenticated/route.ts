@@ -15,8 +15,6 @@ export default class AuthenticatedRoute extends Route {
 
   @action
   openRide(_context: unknown, { id }: { type: string; id: string }): void {
-    console.log('open ride @ route', id);
-
     this.transitionTo('authenticated.ride', { id });
   }
 

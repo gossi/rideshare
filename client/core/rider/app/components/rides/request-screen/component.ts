@@ -25,8 +25,6 @@ export default class RequestComponent extends Component<RequestArgs> {
 
   @action
   activate() {
-    console.log('activate', this.flow);
-
     this.flow.send('REQUEST');
   }
 }

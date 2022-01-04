@@ -1,0 +1,11 @@
+<h1>Ride</h1>
+
+{{#if this.ride.loading}}
+  <span aria-busy="true">Loading</span>
+{{/if}}
+
+{{#if this.ride.data}}
+  <p>State: <code>{{this.ride.data.state}}</code></p>
+  <p>From: {{this.ride.data.from}}</p>
+  <p>To: {{this.ride.data.to}}</p>
+{{/if}}
