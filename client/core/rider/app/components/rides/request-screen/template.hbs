@@ -1,17 +1,26 @@
 {{did-insert this.activate}}
 <h1>Request a new Ride</h1>
 
-<form {{on "submit" this.submit}}>
-  <label>
-    From:
-    <input type="text" name="from">
-  </label>
+<form {{on "submit" this.submit}} class="grid">
+  <div>
+    <label>
+      From:
+      <input type="text" name="from">
+    </label>
 
-  <label>
-    To:
-    <input type="text" name="to">
-  </label>
+    <label>
+      To:
+      <input type="text" name="to">
+    </label>
 
-  {{!-- template-lint-disable require-input-label --}}
-  <input type="submit" value="Request">
+    {{!-- template-lint-disable require-input-label --}}
+    <input type="submit" value="Request">
+  </div>
+
+  <div>
+    <LeafletMap local-class="map" @lat={{this.lat}} @lng={{this.lng}} @zoom={{10}} as |layers|>
+      <layers.tile @url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png" />
+    </LeafletMap>
+    <button type="button" {{on "click" this.locateMe}}>Locate me</button>
+  </div>
 </form>

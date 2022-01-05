@@ -1,9 +1,9 @@
 import { action } from '@ember/object';
 import Transition from '@ember/routing/-private/transition';
 import Route from '@ember/routing/route';
-import { inject as service } from '@ember/service';
+import { service } from '@ember/service';
 import Session from 'ember-simple-auth/services/session';
-import { matchesState, useMachine } from 'ember-statecharts';
+import { useMachine } from 'ember-statecharts';
 import { RidesMachine } from './flows';
 
 export default class AuthenticatedRoute extends Route {
@@ -28,16 +28,9 @@ export default class AuthenticatedRoute extends Route {
     };
   });
 
-  @matchesState('rides', 'flow') rides?: boolean;
-  @matchesState('request', 'flow') request?: boolean;
-  @matchesState('ride', 'flow') ride?: boolean;
-
   model() {
     return {
-      flow: this.flow,
-      rides: this.rides,
-      request: this.request,
-      ride: this.ride
+      flow: this.flow
     };
   }
 }

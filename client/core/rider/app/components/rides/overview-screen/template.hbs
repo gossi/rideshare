@@ -1,5 +1,24 @@
-<h1>My Rides</h1>
+<div local-class="header">
+  <h1>My Rides</h1>
 
-<CommandElement @command={{@requestRideLink}}>
-  Request Ride
-</CommandElement>
+  <div>
+    <CommandElement @command={{@requestRideLink}}>
+      Request Ride
+    </CommandElement>
+
+    Request with geolocation
+    {{! this should open request ride and trigger the "locate me" action}}
+  </div>
+</div>
+
+{{#if this.rides.loading}}
+  <span aria-busy="true">Loading</span>
+{{/if}}
+
+{{#if this.rides.data}}
+  <div local-class="rides">
+    {{#each this.rides.data as |ride|}}
+      <Rides::RideCard @rideRouteName={{@rideRouteName}} @ride={{ride}} />
+    {{/each}}
+  </div>
+{{/if}}

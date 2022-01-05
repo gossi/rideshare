@@ -1,0 +1,14 @@
+.map {
+  width: 100%;
+  height: 300px;
+}
+
+.map :global(.leaflet-bar) a[role='button'] {
+  padding: revert;
+  border: revert;
+  border-radius: revert;
+  display: block;
+
+  --background-color: white;
+  --color: black;
+}
