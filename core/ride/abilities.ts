@@ -1,5 +1,5 @@
+import { isDriver, isRider, User } from '@rideshare/user';
 import { Ride, RideState } from './ride';
-import { User, isDriver, isRider } from '@rideshare/user';
 
 export function canAccept(ride: Ride, user: User) {
   return ride.state === RideState.Requested && isDriver(user);

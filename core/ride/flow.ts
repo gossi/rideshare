@@ -1,6 +1,6 @@
 import { User } from '@rideshare/user';
-import { canAccept, canCancel, canDecline, canFinish, canStart } from 'abilities';
 import { createMachine } from 'xstate';
+import { canAccept, canCancel, canDecline, canFinish, canStart } from './abilities';
 import { Ride, RideState } from './ride';
 
 type RideEvent =
