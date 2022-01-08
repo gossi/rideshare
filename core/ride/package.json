@@ -12,6 +12,10 @@
     "build:js": "swc ./* -d dist/",
     "build:types": "tsc -d --emitDeclarationOnly"
   },
+  "dependencies": {
+    "@rideshare/user": "^0.0.0",
+    "xstate": "^4.27.0"
+  },
   "devDependencies": {
     "@swc/cli": "^0.1.55",
     "@swc/core": "^1.2.122",

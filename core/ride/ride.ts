@@ -1,13 +1,18 @@
 export enum RideState {
   Requested = 'requested',
   AwaitingPickup = 'awaiting-pickup',
-  Riding = 'riding',
+  Driving = 'driving',
 
-  // termination states
-  DriverNotFound = 'driver-not-found',
+  /** Ride is finished */
+  Finished = 'finished',
+
+  /** Rider declined the ride */
   Declined = 'declined',
-  Finished = 'finished'
+  /** Rider canceled the request */
+  Canceled = 'canceled',
 
+  /** Requested timed out, no driver found */
+  DriverNotFound = 'driver-not-found'
 }
 
 export interface Ride {
