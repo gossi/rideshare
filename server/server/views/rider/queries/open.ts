@@ -5,7 +5,13 @@ import { RideState } from '@rideshare/ride';
 
 export type AllResultItem = QueryResultItem;
 
-export const mine: QueryHandler<AllResultItem, Infrastructure> = {
+const OPEN_STATES = [
+  RideState.Requested,
+  RideState.Driving,
+  RideState.AwaitingPickup
+];
+
+export const open: QueryHandler<AllResultItem, Infrastructure> = {
   type: 'stream',
 
   getResultItemSchema (): Schema {
@@ -23,14 +29,7 @@ export const mine: QueryHandler<AllResultItem, Infrastructure> = {
         },
         state: {
           type: "string",
-          enum: [
-            RideState.Requested,
-            RideState.Riding,
-            RideState.AwaitingPickup,
-            RideState.Declined,
-            RideState.DriverNotFound,
-            RideState.Finished
-          ]
+          enum: OPEN_STATES
         },
         riderId: {
           type: "string"
@@ -45,8 +44,17 @@ export const mine: QueryHandler<AllResultItem, Infrastructure> = {
   },
 
   async handle(options, { infrastructure }): Promise<Readable> {
+    // get the rides
+    let rides = infrastructure.ask.viewStore.rides;
+
+    // filter by states
+    rides = rides.filter(ride => OPEN_STATES.includes(ride.state));
+    
     // here we would filter by user
-    return Readable.from(infrastructure.ask.viewStore.rides);
+    // @TODO
+
+    // return them
+    return Readable.from(rides);
   },
 
   isAuthorized (): boolean {

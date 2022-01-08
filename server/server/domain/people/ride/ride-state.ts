@@ -1,7 +1,7 @@
 import { GetInitialState, State } from 'wolkenkit';
 import { Ride, RideState as RideStatus } from '@rideshare/ride';
 
-export interface RideState extends State, Pick<Ride, 'from' | 'to' | 'state' | 'riderId'> {
+export interface RideState extends State, Pick<Ride, 'from' | 'to' | 'state' | 'riderId' | 'driverId'> {
 }
 
 export const getInitialState: GetInitialState<RideState> = function (): RideState {
@@ -9,6 +9,7 @@ export const getInitialState: GetInitialState<RideState> = function (): RideStat
     from: '',
     to: '',
     state: RideStatus.Requested,
-    riderId: ''
+    riderId: '',
+    driverId: '',
   };
 };

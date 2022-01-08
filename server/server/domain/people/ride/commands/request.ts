@@ -1,7 +1,7 @@
+import { Ride } from '@rideshare/ride';
+import { CommandData, CommandHandler, Schema } from 'wolkenkit';
 import { Infrastructure } from '../../../../infrastructure';
 import { RideState } from '../ride-state';
-import { CommandData, CommandHandler, Schema } from 'wolkenkit';
-import { Ride } from '@rideshare/ride';
 
 export type RequestData = CommandData & Pick<Ride, 'from' | 'to' | 'riderId'>;
 

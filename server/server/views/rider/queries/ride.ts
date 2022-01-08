@@ -42,7 +42,7 @@ export const ride: QueryHandler<RideResultItem, Infrastructure, RideQuery> = {
           type: "string",
           enum: [
             RideState.Requested,
-            RideState.Riding,
+            RideState.Driving,
             RideState.AwaitingPickup,
             RideState.Declined,
             RideState.DriverNotFound,

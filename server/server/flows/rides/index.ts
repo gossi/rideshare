@@ -1,11 +1,23 @@
 import { Flow } from 'wolkenkit';
-import { handleRideRequested } from './handlers/requested';
+import {
+  handleRideAccepted,
+  handleRideCanceled,
+  handleRideDeclined,
+  handleRideFinished,
+  handleRideRequested,
+  handleRideStarted
+} from './handlers';
 
 const rides: Flow = {
   replayPolicy: 'always',
 
   domainEventHandlers: {
-    handleRideRequested
+    handleRideAccepted,
+    handleRideCanceled,
+    handleRideDeclined,
+    handleRideFinished,
+    handleRideRequested,
+    handleRideStarted
   }
 };
 

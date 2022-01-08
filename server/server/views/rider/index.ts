@@ -1,10 +1,10 @@
-import { mine } from './queries/mine';
+import { open } from './queries/open';
 import { ride } from './queries/ride';
 import { View } from 'wolkenkit';
 
 const rides: View = {
   queryHandlers: {
-    mine,
+    open,
     ride
   },
 

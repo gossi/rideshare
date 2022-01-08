@@ -1,7 +1,7 @@
+import { Ride, RideState as State } from '@rideshare/ride';
+import { DomainEventData, DomainEventHandler, Schema } from 'wolkenkit';
 import { Infrastructure } from '../../../../infrastructure';
 import { RideState } from '../ride-state';
-import { DomainEventData, DomainEventHandler, Schema } from 'wolkenkit';
-import { Ride } from '@rideshare/ride';
 
 export type RequestedData = DomainEventData & Pick<Ride, 'from' | 'to' | 'riderId'>;
 
@@ -12,7 +12,8 @@ export const requested: DomainEventHandler<RideState, RequestedData, Infrastruct
       properties: {
         from: { type: 'string' },
         to: { type: 'string' },
-        riderId: { type: 'string' }
+        riderId: { type: 'string' },
+        state: { type: 'string', enum: [State.AwaitingPickup] }
       },
       required: ['from', 'to', 'riderId'],
       additionalProperties: false
@@ -30,5 +31,5 @@ export const requested: DomainEventHandler<RideState, RequestedData, Infrastruct
       to: domainEvent.data.to,
       riderId: domainEvent.data.riderId
     };
-  },
+  }
 };
