@@ -3,7 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { UserType } from '@rideshare/user';
 import type { User } from '@rideshare/user';
 
-export default class BaseSessionService extends Session {
+export default class SessionService extends Session {
   @tracked user?: User;
 
   async setup() {
