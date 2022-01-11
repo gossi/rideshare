@@ -10,7 +10,7 @@ const handleRideDeclined: FlowHandler<DeclinedData, Infrastructure> = {
 
   async handle(domainEvent, { infrastructure, notification }): Promise<void> {
     const id = domainEvent.aggregateIdentifier.id;
-    const ride = infrastructure.ask.viewStore.rides.find(ride => ride.id === id);
+    const ride = infrastructure.tell.viewStore.rides.find(ride => ride.id === id);
 
     ride!.state = domainEvent.data.state;
 

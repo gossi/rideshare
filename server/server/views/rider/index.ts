@@ -1,6 +1,7 @@
+import { View } from 'wolkenkit';
+import { flowRidesUpdatedNotificationSubscriber } from './notification-subscribers/flow-rides-updated';
 import { open } from './queries/open';
 import { ride } from './queries/ride';
-import { View } from 'wolkenkit';
 
 const rides: View = {
   queryHandlers: {
@@ -8,7 +9,9 @@ const rides: View = {
     ride
   },
 
-  notificationSubscribers: {}
+  notificationSubscribers: {
+    flowRidesUpdatedNotificationSubscriber
+  }
 };
 
 export default rides;
