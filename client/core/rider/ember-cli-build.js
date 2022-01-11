@@ -9,7 +9,7 @@ module.exports = function (defaults) {
       useSessionSetupMethod: true
     },
     autoImport: {
-      watchDependencies: ['@rideshare/auth']
+      watchDependencies: ['@rideshare/auth', '@rideshare/data']
     }
   });
 

@@ -6,7 +6,7 @@ import { gql } from 'glimmer-apollo';
 export const RIDES = gql`
   query Rides {
     rider {
-      mine {
+      open {
         id
         from
         to
@@ -19,19 +19,13 @@ export const RIDES = gql`
 export type RidesQuery = {
   __typename?: 'Query';
   rider: {
-    mine: Pick<Ride, 'id' | 'from' | 'to' | 'state'>[];
+    open: Pick<Ride, 'id' | 'from' | 'to' | 'state'>[];
   };
 };
 
 export type RidesQueryVariables = Record<string, unknown>;
 
 export class RidesResource extends Resource {
-  // constructor(owner: unknown, args: RideArgs, previous: RidesResource) {
-  //   super(owner, args, previous);
-
-  //   console.log('ride resource', args);
-  // }
-
   query = useQuery<RidesQuery, RidesQueryVariables>(this, () => [RIDES]);
 
   get loading() {
@@ -47,6 +41,6 @@ export class RidesResource extends Resource {
   }
 
   get data() {
-    return this.query.data?.rider.mine;
+    return this.query.data?.rider.open;
   }
 }

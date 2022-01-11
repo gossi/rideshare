@@ -1,11 +1,19 @@
 <h1>Ride</h1>
 
-{{#if this.ride.loading}}
+{{#if this.resource.loading}}
   <span aria-busy="true">Loading</span>
 {{/if}}
 
-{{#if this.ride.data}}
-  <p>State: <code>{{this.ride.data.state}}</code></p>
-  <p>From: {{this.ride.data.from}}</p>
-  <p>To: {{this.ride.data.to}}</p>
+{{#if this.ride}}
+  <p>State: <code>{{this.ride.state}}</code></p>
+  <p>From: {{this.ride.from}}</p>
+  <p>To: {{this.ride.to}}</p>
+
+  {{#if (this.ability.canCancel this.ride)}}
+    <button type="button" {{on "click" this.cancel}}>Cancel</button>
+  {{/if}}
+
+  {{#if (this.ability.canDecline this.ride)}}
+    Decline
+  {{/if}}
 {{/if}}

@@ -2,7 +2,7 @@ import { inject as context } from '@alexlafroscia/ember-context';
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import RequestRide from '@rideshare/rider/aggregates/ride/commands/request-ride';
+import RequestRide from '@rideshare/rider/aggregates/ride/commands/request';
 import { RidesStatechart } from '@rideshare/rider/authenticated/flows';
 import { command, commandFor } from 'ember-command';
 
